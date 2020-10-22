@@ -19,7 +19,7 @@ $prmarray = cnv_formstr($_POST);
 
 $key = (isset($prmarray["key"])) ? $prmarray["key"] : "";
 
-$p = (isset($prmarray["p"])) ? $prmarray["p"] : 1;
+$p = (isset($prmarray["p"])) ? intval($prmarray["p"]) : 1;
 $p = ($p < 1) ? 1 : $p;
 ?>
 
@@ -33,7 +33,7 @@ $p = ($p < 1) ? 1 : $p;
     <input type="hidden" name="act" value="src">
 </form>
 
-<?php disp_listata($key,$p); ?>
+<?php disp_listdata($key,$p); ?>
 </div>
 </body>
 </html>
@@ -53,9 +53,9 @@ function cnv_formstr($array){
     return $array;
 }
 
-function cnv_splstr($string){
+function cnv_sqlstr($string){
 
-    $det_enc = mb_detect_encoding($string,"UTF-8","EUC-JP","SJIS");
+    $det_enc = mb_detect_encoding($string,"UTF-8,EUC-JP,SJIS");
     if($det_enc and $det_enc != ENCDB){
         $string = mb_convert_encoding($string,ENCDB,$det_enc);
     }
@@ -65,7 +65,7 @@ function cnv_splstr($string){
 
 function cnv_dispstr($string ){
 
-    $det_enc = mb_detect_encoding($string,"UTF-8","EUC-JP","SJIS");
+    $det_enc = mb_detect_encoding($string,"UTF-8,EUC-JP,SJIS");
     if ($det_enc and $det_enc != ENCDISP) {
         return mb_convert_encoding($string,ENCDISP,$det_enc);
     }
@@ -86,11 +86,11 @@ function disp_listdata($key,$p){
 
     $sql = "SELECT * FROM linkdata";
     if(strlen($key) > 0){
-        $sql .= " WHERE (l_url LIKE '%".cnv_splstr($key)."%')";
-        $sql .= " OR (l_title LIKE '%".cnv_splstr($key)."%')";
-        $sql .= " OR (l_comment LIKE '%".cnv_splstr($key)."%')";
+        $sql .= " WHERE (l_url LIKE '%".cnv_sqlstr($key)."%')";
+        $sql .= " OR (l_title LIKE '%".cnv_sqlstr($key)."%')";
+        $sql .= " OR (l_comment LIKE '%".cnv_sqlstr($key)."%')";
     }
-    $sql .= "ORDER BY l_data DESC LIMIT $st,". intval(PAGESIZE);
+    $sql .= " ORDER BY l_date DESC LIMIT $st,". intval(PAGESIZE);
 
     $res =db_query($sql,$conn);
     if($res->num_rows <= 0 ){
@@ -105,14 +105,15 @@ function disp_listdata($key,$p){
     <ul>
     <?php while($row = $res->fetch_array(MYSQLI_ASSOC)){?>
     <li><?=cnv_link($row["l_url"],cnv_dispstr($row["l_title"]))?>
-    --- <?=cnv_dispstr($row["l_coment"])?>
+    --- <?=cnv_dispstr($row["l_comment"])?>
+    (<?=date("Y/m/d",strtotime($row["l_date"]))?>)
     <?php }?>
     </ul>
     </td>
     </tr>
     </table>
 
-<?php disp_pagenav($key,$p); ?>
+    <?php disp_pagenav($key,$p); ?>
 
 <?php
 }
@@ -127,9 +128,9 @@ function disp_pagenav($key,$p = 1){
     $sql = "SELECT COUNT(*) AS cnt FROM linkdata";
     if(isset($key)){
         if(strlen($key) > 0){
-        $sql .= " WHERE (l_url LIKE '%".cnv_splstr($key)."%')";
-        $sql .= " OR (l_title LIKE '%".cnv_splstr($key)."%')";
-        $sql .= " OR (l_comment LIKE '%".cnv_splstr($key)."%')";
+        $sql .= " WHERE (l_url LIKE '%".cnv_sqlstr($key)."%')";
+        $sql .= " OR (l_title LIKE '%".cnv_sqlstr($key)."%')";
+        $sql .= " OR (l_comment LIKE '%".cnv_sqlstr($key)."%')";
         }
     }
     $res = db_query($sql, $conn);
@@ -139,7 +140,7 @@ function disp_pagenav($key,$p = 1){
     <table>
     <tr>
     <?php if($p > 1){?>
-    <form action="<?=$_SERVER["SCRIPT_NAME"]?>" method="POST">
+    <form method="POST" action="<?=$_SERVER["SCRIPT_NAME"]?>">
     <td><input type="submit" value="<< 前"></td>
     <input type="hidden" name="act" value="src">
     <input type="hidden" name="p" value="<?=$prev?>">
@@ -147,10 +148,10 @@ function disp_pagenav($key,$p = 1){
     </form>
     <?php } ?>
     <?php if($recordcount > ($next - 1)* intval(PAGESIZE)){?>
-    <form action="<?=$_SERVER["SCRIPT_NAME"]?>" method="POST">
+    <form method="POST" action="<?=$_SERVER["SCRIPT_NAME"]?>">
     <td width="50%"><input type="submit" value="次 >>"></td>
     <input type="hidden" name="act" value="src">
-    <input type="hidden" name="p" value="<?=$prev?>">
+    <input type="hidden" name="p" value="<?=$next?>">
     <input type="hidden" name="key" value="<?=$key?>">
     </form>
     <?php }?>

@@ -1,5 +1,5 @@
 <?php
-
+//onlineLINK setting file
 define("DEFSCR", "log");
 define("AUTHADMIN", "1");
 
@@ -10,13 +10,11 @@ define("ENCDB", "UTF-8");
 
 define("ADMINAPPNAME", "リンク管理");
 define("ADMINPAGESIZE", "10");
-define("LOGINID", "");
-define("LOGINPASS", "");
+define("LOGINID", "id");
+define("LOGINPASS", "pass");
 
-define("DBSV", "loclhost");
+define("DBSV", "localhost");
 define("DBNAME", "link");
-define("DBUSER", "");
-define("DBPASS", "");
-
-
+define("DBUSER", "root");
+define("DBPASS", "root");
 ?>
