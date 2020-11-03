@@ -1,0 +1,26 @@
+<% if (val != null) { %>
+  <tr>
+    <th style="width:75px;">
+      <a href="/schedules/edit/<%= val.attributes.id %>"><p>編集</p></a>
+    </th>
+    <th style="width:75px;">
+      <a href="/schedules/delete/<%= val.attributes.id %>"><p>削除</p></a>
+    </th>
+    <td><%= val.attributes.title %></td>
+    <td><%= val.attributes.content %></td>
+    <td><%= val.attributes.place %></td>
+    <%
+    var d = new Date(val.attributes.date);
+    var date = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    %>
+    <td><%= date %></td>
+    <td><%= val.attributes.start_time %></td>
+    <td><%= val.attributes.end_time %></td>
+    <%
+    var d = new Date(val.attributes.created_at);
+    var dstr = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() 
+    + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+    %>
+    <td style="width:150px;"><%= dstr %></td>
+  </tr>
+<% } %>

@@ -1,0 +1,6 @@
+{"id":"mmm","msg":"いいいいい"}
+{"id":"abc","msg":""}
+{"id":"abc","msg":"えええええ"}
+{"id":"abc","msg":"うううう"}
+{"id":"tuyano","msg":"いいいいい"}
+{"id":"tuyano","msg":"ああああ"}
