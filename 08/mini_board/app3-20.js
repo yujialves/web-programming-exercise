@@ -25,97 +25,89 @@ function getFromClient(request, response) {
 
     var url_parts = url.parse(request.url, true);
     switch (url_parts.pathname) {
-
-        case '/': // トップページ(掲示板)
-            response_index(request, response);
-            break;
-        
-        case '/app3-19': // ログインページ
-            response_login(request, response);
-            break;
-        
-        case '/style.css':
-            response.writeHead(200, {'Content-Type': 'text/css'});
-            response.write(style_css);
-            response.end();
-            break;
-
-        default:
-            response.writeHead(200, {'Content-Type': 'text/plain'});
-            response.end('no page...');
-            break;
+  
+      case '/': // トップページ（メッセージボード）
+        response_index(request, response);
+        break;
+  
+      case '/login': // ログインページ
+        response_login(request, response);
+        break;
+  
+      default:
+        response.writeHead(200, { 'Content-Type': 'text/plain' });
+        response.end('no page...');
+        break;
     }
-}
-
-// loginのアクセス処理
-function response_login(request, response) {
+  }
+  
+  // loginのアクセス処理
+  function response_login(request, response) {
     var content = ejs.render(login_page, {});
-    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.writeHead(200, { 'Content-Type': 'text/html' });
     response.write(content);
     response.end();
-}
-
-// indexのアクセス処理
-function response_index(request, response) {
+  }
+  
+  // indexのアクセス処理
+  function response_index(request, response) {
     // POSTアクセス時の処理
     if (request.method == 'POST') {
-        var body = '';
-
-        //データ受信のイベント処理
-        request.on('data', function (data) {
-            body += data;
-        });
-
-        // データ受信終了のイベント処理
-        request.on('end', function () {
-            data = qs.parse(body);
-            addToData(data.id, data.msg, filename, request);
-            write_index(request, response);
-        });
-    } else {
+      var body = '';
+  
+      // データ受信のイベント処理
+      request.on('data', function (data) {
+        body += data;
+      });
+  
+      // データ受信終了のイベント処理
+      request.on('end', function () {
+        data = qs.parse(body);
+        addToData(data.id, data.msg, filename, request);
         write_index(request, response);
+      });
+    } else {
+      write_index(request, response);
     }
-}
-
-// indexのページ作成
-function write_index(request, response) {
+  }
+  
+  // indexのページ作成
+  function write_index(request, response) {
     var msg = "※何かメッセージを書いて下さい。";
     var content = ejs.render(index_page, {
-        title: 'Index',
-        content: msg,
-        data: message_data,
-        filename: 'app3-18',
+      title: 'Index',
+      content: msg,
+      data: message_data,
+      filename: 'app3-18',
     });
-    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.writeHead(200, { 'Content-Type': 'text/html' });
     response.write(content);
     response.end();
-}
-
-// テキストファイルをロード
-function readFromFile(fname) {
+  }
+  
+  // テキストファイルをロード
+  function readFromFile(fname) {
     fs.readFile(fname, 'utf8', (err, data) => {
-        message_data = data.split('\n');
-    });
-}
-
-// データを更新
-function addToData(id, msg, fname, request) {
-    var obj = {'id': id, 'msg': msg};
+      message_data = data.split('\n');
+    })
+  }
+  
+  // データを更新
+  function addToData(id, msg, fname, request) {
+    var obj = { 'id': id, 'msg': msg };
     var obj_str = JSON.stringify(obj);
     console.log('add data: ' + obj_str);
     message_data.unshift(obj_str);
     if (message_data.length > max_num) {
-        message_data.pop();
+      message_data.pop();
     }
     saveToFile(fname);
-}
-
-// データを保存
-function saveToFile(fname) {
+  }
+  
+  // データを保存
+  function saveToFile(fname) {
     var data_str = message_data.join('\n');
     fs.writeFile(fname, data_str, (err) => {
-        if (err) {
-            throw err;
-        }
+      if (err) { throw err; }
     });
-}
+  }

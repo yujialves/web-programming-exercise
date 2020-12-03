@@ -3,18 +3,15 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var session = require("express-session");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var helloRouter = require('./routes/hello');
-var ajax = require("./routes/ajax");
-var session_opt = {
-    secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 60 * 60 * 1000 }
-};
+
+//リスト4-10追加分
+var hello = require('./routes/hello');
+
+//リスト4-15追加分
+const session = require('express-session'); //☆
 
 var app = express();
 
@@ -27,12 +24,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use("/ajax", ajax);
 
+//リスト4-15追加分
+var session_opt = {
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false, 
+  cookie: { maxAge: 60 * 60 * 1000 }
+};
 app.use(session(session_opt));
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/hello', helloRouter);
+
+//リスト4-10追加分
+app.use('/hello', hello);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

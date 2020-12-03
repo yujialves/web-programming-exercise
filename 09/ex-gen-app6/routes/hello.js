@@ -1,37 +1,30 @@
-var express = require("express");
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var mysql = require("mysql"); //★追加
+const sqlite3 = require('sqlite3');
 
-//MySQLの設定情報
-var mysql_setting = {
-    host     : "localhost",
-    user     : "root",
-    password : "root",
-    database : "my-nodeapp-db"
-};
+// データベースオブジェクトの取得
+const db = new sqlite3.Database('mydb.sqlite3');
 
 // GETアクセスの処理
-router.get("/", (req, res, next) => {
-
-    //コネクションの用意
-    var connection = mysql.createConnection(mysql_setting);
-
-    //データベースに接続
-    connection.connect();
-
-    //データを取り出す
-    connection.query("SELECT * from mydata", 
-            function(error, results, fields) {
-        //データベースアクセス完了時の処理
-        if (error == null) {
-            var data = {title: "mysql", content: results};
-            res.render("hello", data);
-        }
-    });
-
-    //接続を解除
-    connection.end();
+router.get('/',(req, res, next) => {
+  db.serialize(() => {
+    var rows = "";
+    db.each("select * from mydata",(err, row) => {
+      if (!err) {
+        rows += "<tr><th>" + row.id + "</th><td>"
+          + row.name + "</td><td></tr>";
+      }   
+    }, (err, count) => {
+      if (!err){
+        var data = {
+          title: 'Hello!',
+          content: rows
+        };
+        res.render('hello', data);        
+      }
+    }); 
+  });
 });
 
 module.exports = router;
